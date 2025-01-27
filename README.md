@@ -6,8 +6,12 @@ A arquitetura da **API** baseia-se em **REST**, utilizando métodos **HTTP** pad
 
 Dentre os pacotes NuGet utilizados, o **AutoMapper** é o responsável pelo mapeamento entre objetos de domínio e requisição/resposta, reduzindo a necessidade de código repetitivo e manual. O **Shouldly** é utilizado nos testes de unidade para tornar as verificações mais legíveis, ajudando a escrever testes claros e compreensíveis. Para as validações, o **FluentValidation** é usado para implementar regras de validação de forma simples e intuitiva nas classes de requisições, mantendo o código limpo e fácil de manter. Por fim, o **EntityFramework** atua como um ORM (Object-Relational Mapper) que simplifica as interações com o banco de dados, permitindo o uso de objetos .NET para manipular dados diretamente, sem a necessidade de lidar com consultas SQL.
 
-<img src="Images/Swagger.API.png" alt="image-api" width="200"/>
-<img src="Images/Report.PDF.png" alt="image-pdf" width="100" /> <img src="Images/Report.Excel.png" alt="image-excel" width="200" />
+<div style="display: flex; gap: 10px;">
+  <img src="Images/Swagger.API.png" alt="image-api" width="300"/>
+  <img src="Images/Report.PDF.png" alt="image-pdf" width="200"/>
+  <img src="Images/Report.Excel.png" alt="image-excel" width="300"/>
+</div>
+
 
 ### Features
 
