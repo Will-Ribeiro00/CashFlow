@@ -5,12 +5,6 @@ namespace CashFlow.Domain.Repositories.Expenses
     public interface IExpensesWriteOnlyRepository
     {
         Task Add(Expense expense);
-
-        /// <summary>
-        /// This function returns TRUE if the deletion was successfull otherwise returns FALSE
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<bool> Delete(int id);
+        Task Delete(int id);
     }
 }

@@ -3,6 +3,7 @@ using CashFlow.Application.UseCases.Expenses.Reports.Pdf.Fonts;
 using CashFlow.Domain.Extensions;
 using CashFlow.Domain.Reports;
 using CashFlow.Domain.Repositories.Expenses;
+using CashFlow.Domain.Services.LoggedUser;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;
 using MigraDoc.Rendering;
@@ -15,22 +16,26 @@ namespace CashFlow.Application.UseCases.Expenses.Reports.Pdf
     {
         public const string currentSymbol = "$";
         public const int HEIGHT_ROW_EXPENSE_TABLE = 25;
+
         private readonly IExpensesReadOnlyRepository _repository;
-        public GenerateExpensesReportPdfUseCase(IExpensesReadOnlyRepository repository)
+        private readonly ILoggedUser _loggedUser;
+        public GenerateExpensesReportPdfUseCase(IExpensesReadOnlyRepository repository, ILoggedUser loggedUser)
         {
             _repository = repository;
+            _loggedUser = loggedUser;
 
             GlobalFontSettings.FontResolver = new ExpesesReportFontResolver();
         }
         public async Task<byte[]> Execute(DateOnly dateRequest)
         {
-            var expenses = await _repository.FilterByMonth(dateRequest);
+            var loggedUser = await _loggedUser.Get();
+            var expenses = await _repository.FilterByMonth(dateRequest, loggedUser);
             if (expenses.Count == 0) return [];
 
-            var document = CreateDocument(dateRequest);
+            var document = CreateDocument(dateRequest, loggedUser.Name);
             var page = CreatePage(document);
 
-            AddHeaderWithLogoPhotoAndName(page);
+            AddHeaderWithLogoPhotoAndName(page, loggedUser.Name);
 
             var totalExpenses = expenses.Sum(ex => ex.Amount);
             CreateTotalSpentSection(totalExpenses, dateRequest, page);
@@ -70,11 +75,11 @@ namespace CashFlow.Application.UseCases.Expenses.Reports.Pdf
             return RenderDocument(document);
         }
 
-        private Document CreateDocument(DateOnly dateRequest)
+        private Document CreateDocument(DateOnly dateRequest, string author)
         {
             var document = new Document();
             document.Info.Title = $"{ResourceReportGenerationMessages.EXPENSES_FOR} {dateRequest:Y}";
-            document.Info.Author = "CashFlow API";
+            document.Info.Author = author;
 
             var style = document.Styles["Normal"];
             style!.Font.Name = FontHelper.DEFAULT_FONT;
@@ -120,9 +125,9 @@ namespace CashFlow.Application.UseCases.Expenses.Reports.Pdf
 
             paragraph.AddLineBreak();
 
-            paragraph.AddFormattedText($"{totalExpenses} {currentSymbol}", new Font { Name = FontHelper.WORKSANS_BLACK, Size = 50 });
+            paragraph.AddFormattedText($"{totalExpenses:f2} {currentSymbol}", new Font { Name = FontHelper.WORKSANS_BLACK, Size = 50 });
         }
-        private void AddHeaderWithLogoPhotoAndName(Section Page)
+        private void AddHeaderWithLogoPhotoAndName(Section Page, string name)
         {
             var table = Page.AddTable();
 
@@ -134,7 +139,7 @@ namespace CashFlow.Application.UseCases.Expenses.Reports.Pdf
             var directoryName = Path.GetDirectoryName(assembly.Location);
             row.Cells[0].AddImage(Path.Combine(directoryName!, "Logo", "CashFlow-Color.png"));
 
-            var greeting = string.Format(ResourceReportGenerationMessages.GREETING, "Will Ribeiro");
+            var greeting = string.Format(ResourceReportGenerationMessages.GREETING, $"{name}");
             row.Cells[1].AddParagraph($"{greeting}");
             row.Cells[1].Format.Font = new Font { Name = FontHelper.RALEWAY_BLACK, Size = 16 };
             row.Cells[1].VerticalAlignment = MigraDoc.DocumentObjectModel.Tables.VerticalAlignment.Center;
@@ -176,7 +181,7 @@ namespace CashFlow.Application.UseCases.Expenses.Reports.Pdf
         }
         private void AddAmountForExpense(Cell cell, decimal amount)
         {
-            cell.AddParagraph($"-{amount} {currentSymbol}");
+            cell.AddParagraph($"-{amount:f2} {currentSymbol}");
             cell.Format.Font = new Font { Name = FontHelper.WORKSANS_REGULAR, Size = 14, Color = ColorsHelper.BLACK };
             cell.Shading.Color = ColorsHelper.WHITE;
             cell.VerticalAlignment = VerticalAlignment.Center;

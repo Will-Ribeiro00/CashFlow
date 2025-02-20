@@ -2,21 +2,29 @@
 using CashFlow.Domain.Extensions;
 using CashFlow.Domain.Reports;
 using CashFlow.Domain.Repositories.Expenses;
+using CashFlow.Domain.Services.LoggedUser;
 using ClosedXML.Excel;
 
 namespace CashFlow.Application.UseCases.Expenses.Reports.Excel
 {
     public class GenerateExpensesReportExcelUseCase : IGenerateExpensesReportExcelUseCase
     {
-        private const string currentSymbol = "$";
+        private const string CURRENT_SYMBOL = "$";
+
         private readonly IExpensesReadOnlyRepository _repository;
-        public GenerateExpensesReportExcelUseCase(IExpensesReadOnlyRepository repository) => _repository = repository;
+        private readonly ILoggedUser _loggedUser;
+        public GenerateExpensesReportExcelUseCase(IExpensesReadOnlyRepository repository, ILoggedUser loggedUser)
+        {
+            _repository = repository;
+            _loggedUser = loggedUser;
+        }
         public async Task<byte[]> Execute(DateOnly dateRequest)
         {
-            var expenses = await _repository.FilterByMonth(dateRequest);
+            var loggedUser = await _loggedUser.Get();
+            var expenses = await _repository.FilterByMonth(dateRequest, loggedUser);
             if (expenses.Count == 0) return [];
 
-            using var workbook = GeneralWorkbookConfiguration();
+            using var workbook = GeneralWorkbookConfiguration(loggedUser.Name);
 
             var worksheet = workbook.Worksheets.Add($"{ResourceReportGenerationMessages.FILE_NAME} - {dateRequest:Y}");
 
@@ -29,7 +37,7 @@ namespace CashFlow.Application.UseCases.Expenses.Reports.Excel
                 worksheet.Cell($"B{row}").Value = item.Date;
                 worksheet.Cell($"C{row}").Value = item.PaymentType.PaymentTypeToString();
                 worksheet.Cell($"D{row}").Value = item.Amount;
-                worksheet.Cell($"D{row}").Style.NumberFormat.Format = $"-{currentSymbol} #,##0.00";
+                worksheet.Cell($"D{row}").Style.NumberFormat.Format = $"-{CURRENT_SYMBOL} #,##0.00";
                 worksheet.Cell($"E{row}").Value = item.Description;
 
                 row++;
@@ -62,10 +70,10 @@ namespace CashFlow.Application.UseCases.Expenses.Reports.Excel
 
             worksheet.Cell("D1").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Right);
         }
-        private XLWorkbook GeneralWorkbookConfiguration()
+        private XLWorkbook GeneralWorkbookConfiguration(string author)
         {
             var workbook = new XLWorkbook();
-            workbook.Author = "CashFlow API";
+            workbook.Author = author;
             workbook.Style.Font.FontSize = 12;
             workbook.Style.Font.FontName = "Times New Roman";
 
@@ -73,8 +81,8 @@ namespace CashFlow.Application.UseCases.Expenses.Reports.Excel
         }
         private void GeneralWorksheetConfiguration(IXLWorksheet worksheet)
         {
-            worksheet.CellsUsed().Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
-            worksheet.CellsUsed().Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+            worksheet.Cells().Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            worksheet.Cells().Style.Border.InsideBorder = XLBorderStyleValues.Thin;
 
             worksheet.Columns().AdjustToContents();
         }

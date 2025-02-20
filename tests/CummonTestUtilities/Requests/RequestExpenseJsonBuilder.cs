@@ -4,7 +4,7 @@ using CashFlow.Communication.Requests.RequestExpenseJson;
 
 namespace CummonTestUtilities.Requests
 {
-    public class RequestRegisterExpenseJsonBuilder
+    public class RequestExpenseJsonBuilder
     {
         public static RequestExpenseJson Build()
         {
@@ -13,7 +13,8 @@ namespace CummonTestUtilities.Requests
                     .RuleFor(r => r.Description, faker => faker.Commerce.ProductDescription())
                     .RuleFor(r => r.Date, faker => faker.Date.Past())
                     .RuleFor(r => r.PaymentType, faker => faker.PickRandom<PaymentType>())
-                    .RuleFor(r => r.Amount, faker => faker.Random.Decimal(min: 1));
+                    .RuleFor(r => r.Amount, faker => faker.Random.Decimal(min: 1))
+                    .RuleFor(r => r.Tags, faker => faker.Make(1, () => faker.PickRandom<Tag>()));
         }
     }
 }

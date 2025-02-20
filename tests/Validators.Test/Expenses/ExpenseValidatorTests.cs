@@ -4,16 +4,16 @@ using CashFlow.Exception;
 using CummonTestUtilities.Requests;
 using Shouldly;
 
-namespace Validators.Test.Expenses.Register
+namespace Validators.Test.Expenses
 {
-    public class RegisterExpenseValidatorTests
+    public class ExpenseValidatorTests
     {
         [Fact]
         public void Success()
         {
             //Arrange
             var validator = new ExpenseValidator();
-            var request = RequestRegisterExpenseJsonBuilder.Build();
+            var request = RequestExpenseJsonBuilder.Build();
 
             //Act
             var result = validator.Validate(request);
@@ -27,7 +27,7 @@ namespace Validators.Test.Expenses.Register
         {
             //Arrange
             var validator = new ExpenseValidator();
-            var request = RequestRegisterExpenseJsonBuilder.Build();
+            var request = RequestExpenseJsonBuilder.Build();
             request.Date = DateTime.UtcNow.AddDays(+1);
 
             //Act
@@ -39,11 +39,27 @@ namespace Validators.Test.Expenses.Register
         }
 
         [Fact]
+        public void ErrorTagInvalid()
+        {
+            //Arrange
+            var validator = new ExpenseValidator();
+            var request = RequestExpenseJsonBuilder.Build();
+            request.Tags.Add((Tag)1000);
+
+            //Act
+            var result = validator.Validate(request);
+
+            //Assert
+            result.IsValid.ShouldBeFalse();
+            result.Errors.ShouldHaveSingleItem().ErrorMessage.ShouldBe(ResourceErrorMessages.TAG_TYPE_NOT_SUPPORTED);
+        }
+
+        [Fact]
         public void ErrorPaymentTypeInvalid()
         {
             //Arrange
             var validator = new ExpenseValidator();
-            var request = RequestRegisterExpenseJsonBuilder.Build();
+            var request = RequestExpenseJsonBuilder.Build();
             var invalidValue = new Random();
             request.PaymentType = (PaymentType)invalidValue.Next(4, 100);
 
@@ -64,7 +80,7 @@ namespace Validators.Test.Expenses.Register
         {
             //Arrange
             var validator = new ExpenseValidator();
-            var request = RequestRegisterExpenseJsonBuilder.Build();
+            var request = RequestExpenseJsonBuilder.Build();
             request.Amount = amount;
 
             //Act
@@ -83,7 +99,7 @@ namespace Validators.Test.Expenses.Register
         {
             //Arrange
             var validator = new ExpenseValidator();
-            var request = RequestRegisterExpenseJsonBuilder.Build();
+            var request = RequestExpenseJsonBuilder.Build();
             request.Title = title;
 
             //Act

@@ -6,10 +6,12 @@ using CashFlow.Application.UseCases.Expenses.Update;
 using CashFlow.Communication.Requests.RequestExpenseJson;
 using CashFlow.Communication.Responses.ResponseErrorJson;
 using CashFlow.Communication.Responses.ResponseExpenseJson;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CashFlow.Api.Controllers
 {
+    [Authorize]
     public class ExpensesController : CashFlowBaseController
     {
         [HttpPost]

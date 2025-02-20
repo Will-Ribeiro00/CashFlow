@@ -3,10 +3,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CashFlow.Infrastructure.Data_Acess
 {
-    internal class CashFlowDbContext : DbContext
+    public class CashFlowDbContext : DbContext
     {
         public CashFlowDbContext(DbContextOptions options) : base(options) { }
         public DbSet<Expense> Expenses { get; set; }
+        public DbSet<User> Users { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Tag>().ToTable("Tags");
+        }
     }
 }
