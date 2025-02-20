@@ -32,8 +32,8 @@ namespace UseCase.Test.Expenses.GetById
                 () => result.Date.ShouldBe(expense.Date),
                 () => result.Amount.ShouldBe(expense.Amount),
                 () => result.PaymentType.ShouldBe((CashFlow.Communication.Enums.PaymentType)expense.PaymentType),
-                () => result.Tags.ShouldNotBeNull()
-                //() => result.Tags.Select(tag => (int)tag).ShouldBeEquivalentTo(expense.Tags.Select(tag => (int)tag.Value)) -- VER ALGUMA FORMA DE FAZER ESSA VALIDAÇÃO
+                () => result.Tags.ShouldNotBeNull(),
+                () => result.Tags.Select(tag => tag.ToString()).ShouldBe(expense.Tags.Select(tag => tag.Value.ToString()))
                 );
         }
 
