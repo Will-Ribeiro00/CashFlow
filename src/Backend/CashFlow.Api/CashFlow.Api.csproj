@@ -16,9 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared\CashFlow.Communication\CashFlow.Communication.csproj" />
+    <ProjectReference Include="..\..\Shared\CashFlow.Exception\CashFlow.Exception.csproj" />
     <ProjectReference Include="..\CashFlow.Application\CashFlow.Application.csproj" />
-    <ProjectReference Include="..\CashFlow.Communication\CashFlow.Communication.csproj" />
-    <ProjectReference Include="..\CashFlow.Exception\CashFlow.Exception.csproj" />
     <ProjectReference Include="..\CashFlow.Infrastructure\CashFlow.Infrastructure.csproj" />
   </ItemGroup>
 

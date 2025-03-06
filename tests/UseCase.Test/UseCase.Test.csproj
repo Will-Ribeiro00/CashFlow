@@ -18,9 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CashFlow.Application\CashFlow.Application.csproj" />
-    <ProjectReference Include="..\..\src\CashFlow.Domain\CashFlow.Domain.csproj" />
-    <ProjectReference Include="..\..\src\CashFlow.Exception\CashFlow.Exception.csproj" />
+    <ProjectReference Include="..\..\src\Backend\CashFlow.Application\CashFlow.Application.csproj" />
+    <ProjectReference Include="..\..\src\Backend\CashFlow.Domain\CashFlow.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Shared\CashFlow.Exception\CashFlow.Exception.csproj" />
     <ProjectReference Include="..\CummonTestUtilities\CummonTestUtilities.csproj" />
   </ItemGroup>
 
